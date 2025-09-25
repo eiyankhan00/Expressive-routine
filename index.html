@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Class Routine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard syntax */
+            background: linear-gradient(-45deg, #e0c3fc, #8ec5fc, #e0c3fc, #8ec5fc);
+            background-size: 400% 400%;
+            animation: subtle-gradient 15s ease infinite;
+        }
+        
+        @keyframes subtle-gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes card-pop-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        @keyframes card-pop-out {
+            from {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+        }
+
+        @keyframes day-bubble-pop {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes icon-float {
+            0% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-8px); }
+            100% { transform: translateY(0); }
+        }
+
+        .main-container {
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .main-container.container-active {
+            transform: scale(0.98);
+        }
+
+        .routine-card {
+            transform: scale(1);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .routine-card.animate-enter {
+            animation: card-pop-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        .routine-card.animate-exit {
+            animation: card-pop-out 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
+        }
+        
+        .routine-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 20px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+        }
+        
+        .routine-card:hover .card-icon-container {
+             transform: rotate(10deg) scale(1.1);
+        }
+
+        .card-icon-container {
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .day-container {
+            touch-action: pan-y; /* Allow vertical scroll but capture horizontal */
+        }
+
+        .day-selector-container.animate-pop {
+            animation: day-bubble-pop 0.4s ease-in-out;
+        }
+        
+        #header-icon-container {
+            animation: icon-float 4s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div class="main-container w-full max-w-sm mx-auto bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-6 my-8 overflow-hidden">
+        <!-- Header Section -->
+        <header class="text-center mb-6">
+            <div id="header-icon-container" class="inline-block p-3 rounded-full mb-3 transition-colors duration-400 ease-in-out">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-mortarboard-fill" viewBox="0 0 16 16">
+                    <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0l7.5-3a.5.5 0 0 0 .025-.917l-7.5-3.5Z"/>
+                    <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466 4.176 9.032Zm-.068 1.873.22-.748 3.496 1.311a.5.5 0 0 0 .352 0l3.496-1.311.22.748L8 12.46l-3.892-1.556Z"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800">Dhaka Institute of Technology</h1>
+            <p class="text-indigo-600 font-medium">Class Routine</p>
+        </header>
+
+        <!-- Day Selector -->
+        <div class="day-selector-container text-center mb-6">
+            <div id="day-bubble" class="inline-block font-semibold py-3 px-8 rounded-2xl transition-colors duration-400 ease-in-out">
+                <span id="day-display">Sunday</span>
+            </div>
+        </div>
+
+        <!-- Routine Container -->
+        <div id="routine-container" class="day-container space-y-4 min-h-[300px]">
+            <!-- Routine cards will be injected here -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-8">
+            <p class="text-slate-500 text-sm font-medium">Created by: Eiyan Khan</p>
+        </footer>
+    </div>
+
+    <script>
+        const routineData = {
+            "Sunday": [
+                { time: "9:00 - 10:35", subject: "Data Base Management System", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`, color: "green" },
+                { time: "10:35 - 11:20", subject: "Sensor & IOT System", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><path d="M10.6 13.4c-1.2-1.2-1.2-3.1 0-4.2"/><path d="M13.4 10.6c1.2 1.2 1.2 3.1 0 4.2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/><circle cx="12" cy="12" r="1"/></svg>`, color: "purple" },
+                { time: "11:20 - 12:50", subject: "Computer Networking", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`, color: "blue" }
+            ],
+            "Monday": [
+                { time: "9:00 - 10:35", subject: "Surveillance Security System", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`, color: "red" },
+                { time: "10:35 - 11:20", subject: "Industrial Management", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>`, color: "yellow" },
+                { time: "11:20 - 12:05", subject: "Microcontroller System Design", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><line x1="8" y1="2" x2="8" y2="22"></line><line x1="16" y1="2" x2="16" y2="22"></line><line x1="2" y1="8" x2="22" y2="8"></line><line x1="2" y1="16" x2="22" y2="16"></line></svg>`, color: "indigo" },
+                { time: "12:05 - 12:50", subject: "Principles of Marketing", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg>`, color: "pink" }
+            ],
+            "Tuesday": [
+                { time: "9:00 - 10:35", subject: "Computer Networking", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`, color: "blue" },
+                { time: "10:35 - 11:20", subject: "Surveillance Security System", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`, color: "red" },
+                { time: "11:20 - 12:50", subject: "Database Management System", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`, color: "green" }
+            ],
+            "Wednesday": [
+                { time: "9:00 - 10:35", subject: "Microcontroller System Design", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><line x1="8" y1="2" x2="8" y2="22"></line><line x1="16" y1="2" x2="16" y2="22"></line><line x1="2" y1="8" x2="22" y2="8"></line><line x1="2" y1="16" x2="22" y2="16"></line></svg>`, color: "indigo" },
+                { time: "10:35 - 11:20", subject: "Sensor & IOT System", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><path d="M10.6 13.4c-1.2-1.2-1.2-3.1 0-4.2"/><path d="M13.4 10.6c1.2 1.2 1.2 3.1 0 4.2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/><circle cx="12" cy="12" r="1"/></svg>`, color: "purple" },
+                { time: "11:20 - 12:50", subject: "Principles of Marketing", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg>`, color: "pink" }
+            ],
+            "Thursday": [
+                { time: "9:00 - 10:35", subject: "Sensor & IOT System", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><path d="M10.6 13.4c-1.2-1.2-1.2-3.1 0-4.2"/><path d="M13.4 10.6c1.2 1.2 1.2 3.1 0 4.2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/><circle cx="12" cy="12" r="1"/></svg>`, color: "purple" },
+                { time: "10:35 - 11:20", subject: "Industrial Management", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>`, color: "yellow" },
+                { time: "11:20 - 12:50", subject: "Web Development Project", icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`, color: "teal" }
+            ]
+        };
+
+        const colorClasses = {
+            green: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' },
+            purple: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300' },
+            blue: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
+            red: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-300' },
+            yellow: { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-300' },
+            indigo: { bg: 'bg-indigo-100', text: 'text-indigo-800', border: 'border-indigo-300' },
+            pink: { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-pink-300' },
+            teal: { bg: 'bg-teal-100', text: 'text-teal-800', border: 'border-teal-300' },
+        };
+
+        const dayColorClasses = {
+            "Sunday": { bg: 'bg-green-200', text: 'text-green-900' },
+            "Monday": { bg: 'bg-red-200', text: 'text-red-900' },
+            "Tuesday": { bg: 'bg-blue-200', text: 'text-blue-900' },
+            "Wednesday": { bg: 'bg-indigo-200', text: 'text-indigo-900' },
+            "Thursday": { bg: 'bg-purple-200', text: 'text-purple-900' },
+        };
+
+        const headerIconColorClasses = {
+            "Sunday": { bg: 'bg-green-100', text: 'text-green-600' },
+            "Monday": { bg: 'bg-red-100', text: 'text-red-600' },
+            "Tuesday": { bg: 'bg-blue-100', text: 'text-blue-600' },
+            "Wednesday": { bg: 'bg-indigo-100', text: 'text-indigo-600' },
+            "Thursday": { bg: 'bg-purple-100', text: 'text-purple-600' },
+        };
+
+        const mainContainer = document.querySelector('.main-container');
+        const dayDisplay = document.getElementById('day-display');
+        const daySelectorContainer = document.querySelector('.day-selector-container');
+        const dayBubble = document.getElementById('day-bubble');
+        const headerIconContainer = document.getElementById('header-icon-container');
+        const routineContainer = document.getElementById('routine-container');
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
+        
+        let currentDayIndex = 0; // Always start with Sunday
+
+        function populateNewCards() {
+            routineContainer.innerHTML = '';
+            const day = days[currentDayIndex];
+            const classes = routineData[day] || [];
+
+            if (classes.length === 0) {
+                routineContainer.innerHTML = `<p class="text-center text-gray-500 pt-16">No classes scheduled for today.</p>`;
+            } else {
+                classes.forEach((cls, index) => {
+                    const colors = colorClasses[cls.color] || colorClasses.blue;
+                    const card = document.createElement('div');
+                    card.className = `routine-card flex items-center p-4 rounded-2xl shadow-md border-l-4 ${colors.bg} ${colors.border} animate-enter`;
+                    card.style.animationDelay = `${index * 90}ms`;
+                    card.innerHTML = `
+                        <div class="card-icon-container flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full ${colors.text} bg-white/50 mr-4">
+                            ${cls.icon}
+                        </div>
+                        <div class="flex-grow">
+                            <p class="font-bold text-md ${colors.text}">${cls.subject}</p>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <p class="text-sm font-semibold bg-white/60 px-2 py-1 rounded-md ${colors.text}">${cls.time}</p>
+                        </div>
+                    `;
+                    routineContainer.appendChild(card);
+                });
+            }
+        }
+
+        function renderRoutine(direction = 'none') {
+            const day = days[currentDayIndex];
+            dayDisplay.textContent = day;
+
+            // Animate day selector
+            daySelectorContainer.classList.remove('animate-pop');
+            void daySelectorContainer.offsetWidth; // Trigger reflow
+            daySelectorContainer.classList.add('animate-pop');
+
+            // Update day bubble color
+            const dayColors = dayColorClasses[day];
+            Object.values(dayColorClasses).forEach(colorSet => {
+                dayBubble.classList.remove(colorSet.bg, colorSet.text);
+            });
+            dayBubble.classList.add(dayColors.bg, dayColors.text);
+
+             // Update header icon color
+            const headerIconColors = headerIconColorClasses[day];
+            Object.values(headerIconColorClasses).forEach(colorSet => {
+                headerIconContainer.classList.remove(colorSet.bg, colorSet.text);
+            });
+            headerIconContainer.classList.add(headerIconColors.bg, headerIconColors.text);
+
+            const existingCards = routineContainer.querySelectorAll('.routine-card');
+            
+            if (existingCards.length > 0 && direction !== 'none') {
+                existingCards.forEach((card, index) => {
+                    card.style.animationDelay = `${index * 50}ms`;
+                    card.classList.remove('animate-enter');
+                    card.classList.add('animate-exit');
+                });
+                
+                const timeout = 250 + existingCards.length * 50;
+                setTimeout(populateNewCards, timeout);
+            } else {
+                 populateNewCards();
+            }
+        }
+
+        // Swipe functionality
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        function handleGesture() {
+            if (touchEndX < touchStartX - 50) { // Swiped left
+                currentDayIndex = (currentDayIndex + 1) % 5;
+                renderRoutine('left');
+            }
+
+            if (touchEndX > touchStartX + 50) { // Swiped right
+                currentDayIndex = (currentDayIndex - 1 + 5) % 5;
+                renderRoutine('right');
+            }
+        }
+
+        routineContainer.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+            mainContainer.classList.add('container-active');
+        }, { passive: true });
+
+        routineContainer.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            mainContainer.classList.remove('container-active');
+            handleGesture();
+        });
+        
+        // Mouse drag for desktop
+        let isMouseDown = false;
+        routineContainer.addEventListener('mousedown', e => {
+            isMouseDown = true;
+            touchStartX = e.screenX;
+            routineContainer.style.cursor = 'grabbing';
+            mainContainer.classList.add('container-active');
+        });
+        
+        routineContainer.addEventListener('mouseup', e => {
+            if (!isMouseDown) return;
+            isMouseDown = false;
+            touchEndX = e.screenX;
+            routineContainer.style.cursor = 'grab';
+            mainContainer.classList.remove('container-active');
+            handleGesture();
+        });
+
+        routineContainer.addEventListener('mouseleave', e => {
+            if (!isMouseDown) return;
+            isMouseDown = false;
+            mainContainer.classList.remove('container-active');
+            routineContainer.style.cursor = 'grab';
+        });
+
+
+        // Initial render
+        renderRoutine();
+    </script>
+
+</body>
+</html>
+
