@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -43,7 +43,7 @@
             }
             to {
                 opacity: 0;
-                transform: scale(0.95) translateY(20px);
+                transform: scale(0.95) translateY(-20px);
             }
         }
 
@@ -52,16 +52,49 @@
             50% { transform: scale(1.05); }
         }
         
-        @keyframes icon-float {
-            0% { transform: translateY(0); }
-            40% { transform: translateY(-8px); }
-            60% { transform: translateY(-8px); }
-            100% { transform: translateY(0); }
+        @keyframes icon-wobble {
+            0% { transform: translateY(0) rotate(0deg); }
+            30% { transform: translateY(-8px) rotate(-5deg); }
+            60% { transform: translateY(0) rotate(5deg); }
+            80% { transform: translateY(-4px) rotate(-2deg); }
+            100% { transform: translateY(0) rotate(0deg); }
         }
+        
+        @keyframes footer-swoop {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
 
         .main-container {
             transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            position: relative;
+            overflow: hidden; /* Needed for the shine effect */
         }
+        
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle 300px at var(--shine-x, -100%) var(--shine-y, -100%), rgba(255, 255, 255, 0.2), transparent);
+            transition: opacity 0.2s ease;
+            opacity: 0;
+            pointer-events: none; /* Allows clicks to pass through */
+        }
+
+        .main-container:hover::before {
+            opacity: 1;
+        }
+
 
         .main-container.container-active {
             transform: scale(0.98);
@@ -82,7 +115,7 @@
         
         .routine-card:hover {
             transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 20px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+            box-shadow: 0 12px 20px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
         
         .routine-card:hover .card-icon-container {
@@ -90,7 +123,7 @@
         }
 
         .card-icon-container {
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .day-container {
@@ -102,27 +135,33 @@
         }
         
         #header-icon-container {
-            animation: icon-float 4s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+            animation: icon-wobble 5s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+        }
+
+        #footer-credit {
+            animation: footer-swoop 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
 
-    <div class="main-container w-full max-w-sm mx-auto bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-6 my-8 overflow-hidden">
+    <div class="main-container w-full max-w-sm mx-auto bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-6 my-8">
         <!-- Header Section -->
-        <header class="text-center mb-6">
+        <header class="text-center mb-6" style="transition: transform 0.3s ease-out;">
             <div id="header-icon-container" class="inline-block p-3 rounded-full mb-3 transition-colors duration-400 ease-in-out">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-mortarboard-fill" viewBox="0 0 16 16">
                     <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0l7.5-3a.5.5 0 0 0 .025-.917l-7.5-3.5Z"/>
                     <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466 4.176 9.032Zm-.068 1.873.22-.748 3.496 1.311a.5.5 0 0 0 .352 0l3.496-1.311.22.748L8 12.46l-3.892-1.556Z"/>
                 </svg>
             </div>
-            <h1 class="text-2xl font-bold text-slate-800">Dhaka Institute of Technology</h1>
-            <p class="text-indigo-600 font-medium">Class Routine</p>
+            <div class="inline-block bg-gray-100/80 border border-gray-200/80 rounded-2xl py-2 px-6 shadow-sm">
+                <h1 id="main-title" class="text-2xl font-bold text-slate-800">Dhaka Institute of Technology</h1>
+                <p id="sub-title" class="text-sm font-medium text-slate-500 mt-1">Class Routine</p>
+            </div>
         </header>
 
         <!-- Day Selector -->
-        <div class="day-selector-container text-center mb-6">
+        <div class="day-selector-container text-center mb-6" style="transition: transform 0.3s ease-out;">
             <div id="day-bubble" class="inline-block font-semibold py-3 px-8 rounded-2xl transition-colors duration-400 ease-in-out">
                 <span id="day-display">Sunday</span>
             </div>
@@ -134,8 +173,13 @@
         </div>
 
         <!-- Footer -->
-        <footer class="text-center mt-8">
-            <p class="text-slate-500 text-sm font-medium">Created by: Eiyan Khan</p>
+        <footer class="flex justify-center mt-8">
+            <div id="footer-credit" class="inline-flex items-center rounded-full py-2 px-4 transition-colors duration-400 ease-in-out">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block mr-2">
+                    <path d="M8 0L9.42857 6.57143L16 8L9.42857 9.42857L8 16L6.57143 9.42857L0 8L6.57143 6.57143L8 0Z" fill="currentColor"/>
+                </svg>
+                <p class="text-sm font-medium">Created by: <span id="creator-name" class="font-bold">Eiyan Khan</span></p>
+            </div>
         </footer>
     </div>
 
@@ -195,16 +239,31 @@
             "Wednesday": { bg: 'bg-indigo-100', text: 'text-indigo-600' },
             "Thursday": { bg: 'bg-purple-100', text: 'text-purple-600' },
         };
+        
+        const footerColorClasses = {
+            "Sunday": { bg: 'bg-green-100/50', text: 'text-green-800', name: 'text-green-900', icon: 'text-green-600' },
+            "Monday": { bg: 'bg-red-100/50', text: 'text-red-800', name: 'text-red-900', icon: 'text-red-600' },
+            "Tuesday": { bg: 'bg-blue-100/50', text: 'text-blue-800', name: 'text-blue-900', icon: 'text-blue-600' },
+            "Wednesday": { bg: 'bg-indigo-100/50', text: 'text-indigo-800', name: 'text-indigo-900', icon: 'text-indigo-600' },
+            "Thursday": { bg: 'bg-purple-100/50', text: 'text-purple-800', name: 'text-purple-900', icon: 'text-purple-600' },
+        };
 
         const mainContainer = document.querySelector('.main-container');
         const dayDisplay = document.getElementById('day-display');
         const daySelectorContainer = document.querySelector('.day-selector-container');
         const dayBubble = document.getElementById('day-bubble');
         const headerIconContainer = document.getElementById('header-icon-container');
+        const header = document.querySelector('header');
         const routineContainer = document.getElementById('routine-container');
+        const footerCredit = document.getElementById('footer-credit');
+        const creatorName = document.getElementById('creator-name');
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"];
         
-        let currentDayIndex = 0; // Always start with Sunday
+        const todayIndex = new Date().getDay(); // Sunday - 0, Monday - 1, etc.
+        // The routine runs from Sunday (0) to Thursday (4).
+        // If it's Friday (5) or Saturday (6), default to Sunday (0).
+        let currentDayIndex = (todayIndex >= 0 && todayIndex <= 4) ? todayIndex : 0;
+
 
         function populateNewCards() {
             routineContainer.innerHTML = '';
@@ -243,20 +302,38 @@
             daySelectorContainer.classList.remove('animate-pop');
             void daySelectorContainer.offsetWidth; // Trigger reflow
             daySelectorContainer.classList.add('animate-pop');
+            
+            // Animate Footer
+            footerCredit.style.animation = 'none';
+            void footerCredit.offsetWidth; // Trigger reflow
+            footerCredit.style.animation = 'footer-swoop 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both';
+
 
             // Update day bubble color
             const dayColors = dayColorClasses[day];
-            Object.values(dayColorClasses).forEach(colorSet => {
-                dayBubble.classList.remove(colorSet.bg, colorSet.text);
-            });
+            Object.values(dayColorClasses).forEach(colorSet => dayBubble.classList.remove(...Object.values(colorSet)));
             dayBubble.classList.add(dayColors.bg, dayColors.text);
 
-             // Update header icon color
+            // Update header icon color
             const headerIconColors = headerIconColorClasses[day];
-            Object.values(headerIconColorClasses).forEach(colorSet => {
-                headerIconContainer.classList.remove(colorSet.bg, colorSet.text);
-            });
+            Object.values(headerIconColorClasses).forEach(colorSet => headerIconContainer.classList.remove(...Object.values(colorSet)));
             headerIconContainer.classList.add(headerIconColors.bg, headerIconColors.text);
+
+            // Update footer color
+            const footerColors = footerColorClasses[day];
+            const footerText = footerCredit.querySelector('p');
+            const footerIcon = footerCredit.querySelector('svg');
+            Object.values(footerColorClasses).forEach(colorSet => {
+                footerCredit.classList.remove(colorSet.bg);
+                footerText.classList.remove(colorSet.text);
+                creatorName.classList.remove(colorSet.name);
+                footerIcon.classList.remove(colorSet.icon);
+            });
+            footerCredit.classList.add(footerColors.bg);
+            footerText.classList.add(footerColors.text);
+            creatorName.classList.add(footerColors.name);
+            footerIcon.classList.add(footerColors.icon);
+
 
             const existingCards = routineContainer.querySelectorAll('.routine-card');
             
@@ -274,9 +351,20 @@
             }
         }
 
+        // --- Effects ---
+        mainContainer.addEventListener('mousemove', e => {
+            const rect = mainContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            mainContainer.style.setProperty('--shine-x', `${x}px`);
+            mainContainer.style.setProperty('--shine-y', `${y}px`);
+        });
+
+
         // Swipe functionality
         let touchStartX = 0;
         let touchEndX = 0;
+        let swipeDelta = 0;
 
         function handleGesture() {
             if (touchEndX < touchStartX - 50) { // Swiped left
@@ -290,14 +378,26 @@
             }
         }
 
+        const handleTouchMove = (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            swipeDelta = touchEndX - touchStartX;
+            const parallaxAmount = Math.max(-30, Math.min(30, swipeDelta / 10));
+            header.style.transform = `translateY(${parallaxAmount * 0.5}px)`;
+            daySelectorContainer.style.transform = `translateY(${parallaxAmount * 0.2}px)`;
+        };
+
         routineContainer.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
             mainContainer.classList.add('container-active');
+            routineContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
         }, { passive: true });
 
         routineContainer.addEventListener('touchend', e => {
             touchEndX = e.changedTouches[0].screenX;
             mainContainer.classList.remove('container-active');
+            routineContainer.removeEventListener('touchmove', handleTouchMove);
+            header.style.transform = 'translateY(0)';
+            daySelectorContainer.style.transform = 'translateY(0)';
             handleGesture();
         });
         
